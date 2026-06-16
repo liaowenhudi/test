@@ -181,8 +181,22 @@ public class Nodes implements PersistenceRoot {
             Jenkins.checkGoodName(node.getNodeName());
         }
 
-        Node old = nodes.put(node.getNodeName(), node);
-        if (node != old) {
+        // Array used to safely capture the existing node from inside the lambda
+        final Node[] previousNode = new Node[1];
+
+        // Atomic swap: The map is locked ONLY for this tiny operation
+        nodes.compute(node.getNodeName(), (name, existingNode) -> {
+            previousNode[0] = existingNode;
+            return node;
+        });
+
+        Node old = previousNode[0];
+
+        if (node == old) {
+            // Fixes #26692: Sync the active Computer for in-place mutated nodes.
+            // Executed OUTSIDE the compute block to prevent lock-order inversions and deadlocks.
+            Jenkins.get().updateComputers(node);
+        } else {
             handleAddedNode(node, old);
         }
     }
