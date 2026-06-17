@@ -354,7 +354,7 @@ THE SOFTWARE.
                 <artifactItem>
                   <groupId>org.jenkins-ci.plugins</groupId>
                   <artifactId>command-launcher</artifactId>
-                  <version>1.2</version>
+                  <version>134.v025a_5fcf9dea_</version>
                   <type>hpi</type>
                 </artifactItem>
                 <artifactItem>
